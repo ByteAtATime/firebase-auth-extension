@@ -57,7 +57,7 @@ export default function MyComponent() {
 
     if (!accessToken) {
       // The user cancelled the signature, wallet isn't connected, etc.
-      // An error should be displayed to the user, so we ignore it here
+      // An error will be displayed to the user by the hook, so we ignore it here
       return;
     }
 
