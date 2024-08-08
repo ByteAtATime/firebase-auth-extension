@@ -12,7 +12,7 @@ npx create-eth@latest -e ByteAtATime/firebase-auth-extension:main
 
 To get started, you need to get your Firebase credentials. Here is a video that explains how to do that:
 
-![Firebase Configuration](/assets/firebase-creds.mp4)
+![Firebase Configuration](https://github.com/ByteAtATime/firebase-auth-extension/raw/main/assets/firebase-creds.mp4)
 
 By the end of the video, you should have downloaded a file and copied the configuration object. You will need to paste this configuration object in the `packages/nextjs/services/firebase.ts` file.
 
