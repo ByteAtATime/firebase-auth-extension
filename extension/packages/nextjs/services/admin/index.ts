@@ -5,12 +5,12 @@ function initAppFromEnv() {
   if (getApps().length > 0) return;
 
   if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    console.log("Initializing LIVE Firestore with GOOGLE_APPLICATION_CREDENTIALS");
+    console.log("Initializing LIVE Firebase with GOOGLE_APPLICATION_CREDENTIALS");
     initializeApp({
       credential: applicationDefault(),
     });
   } else if (process.env.FIREBASE_PRIVATE_KEY) {
-    console.log("Initializing LIVE Firestore with FIREBASE_PRIVATE_KEY");
+    console.log("Initializing LIVE Firebase with FIREBASE_PRIVATE_KEY");
     initializeApp({
       credential: cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
@@ -19,7 +19,7 @@ function initAppFromEnv() {
       }),
     });
   } else {
-    console.log("Initializing local Firestore instance");
+    console.log("Initializing local Firebase instance from emulators");
     initializeApp({
       projectId: process.env.FIREBASE_PROJECT_ID,
     });
