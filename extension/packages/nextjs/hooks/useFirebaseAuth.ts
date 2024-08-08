@@ -65,8 +65,10 @@ export const useFirebaseAuth = () => {
   return {
     authenticate: async () => {
       setIsAuthenticating(true);
-      await authenticate();
+      const token = await authenticate();
       setIsAuthenticating(false);
+      
+      return token;
     },
     isAuthenticating,
   };
