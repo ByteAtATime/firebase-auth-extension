@@ -2,6 +2,8 @@
 
 This is a simple extension that adds authentication functionality through Firebase for Scaffold-ETH 2.
 
+There is a step-by-step guide at the end of this document that explains how to get started with this project.
+
 ## Installation
 
 ```
