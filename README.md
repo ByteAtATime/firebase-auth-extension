@@ -30,6 +30,16 @@ export const POST = withFirebaseAuth(async (req, { userCredential }) => {
 
 This function is implemented in `packages/nextjs/utils/endpoint-auth.ts`. It will return a 401 error if the user is not authenticated, or if the token is invalid/expired.
 
+The `userCredential.user` is the Firebase `User` object. However, because we're initializing the user through `createCustomToken`, **it is missing many fields**. Crucially:
+* `displayName` is null
+* `email` is null
+* `emailVerified` is false
+* `photoURL` is null
+* `isAnonymous` is false
+* `providerId` and `providerData` are null and blank respectively
+
+The `uid` field is the user's address.
+
 ### Invoking Endpoints
 
 In order to POST to an endpoint, you can use the `useFirebaseAuth` hook. This hook will automatically handle the authentication for you.
