@@ -94,3 +94,111 @@ A few things to note here:
 1. If the `authenticate` function fails, it will create a toast explaining why; you can ignore the error in this case.
 2. For endpoints created using the `withFirebaseAuth` helper, you need to pass the token in the `Authorization` header.
 3. The `authenticate()` function returns a promise of `{ token: string; expires: number }`. If you only need the authentication, remember to use the `.token`!
+
+## Complete Guide
+
+This is a guide that explains how to set up Firebase Auth in Scaffold-ETH 2. By the end, you should have a working (albeit barebones) project!
+
+### Step 1: Create a Firebase Project
+
+1. Go to the Firebase console: https://console.firebase.google.com/
+2. Click on "Add project"
+3. Fill in the project name and click "Continue"
+4. Click "Create project"
+
+### Step 2: Get Firebase Credentials
+
+1. Click on the gear icon and go to "Project settings"
+2. Click on the "Service accounts" tab
+3. Click on "Generate new private key"
+4. Save the file that was downloaded. You will need it later.
+
+### Step 3: Clone Scaffold-ETH 2
+
+1. Set up the project using the following command:
+
+```
+npx create-eth@latest -e ByteAtATime/firebase-auth-extension:main
+```
+
+2. Rename `packages/nextjs/.env.example` to `packages/nextjs/.env`
+
+### Step 4: Fill in the Environment Variables
+
+1. Open the `packages/nextjs/.env`
+2. Fill in the `FIREBASE_PROJECT_ID` field with the project ID from the Firebase console
+3. Do one of the following:
+  * Move the file you downloaded in Step 2 into your project, and set `GOOGLE_APPLICATION_CREDENTIALS` to the path of the file
+  * Copy the `private_key` and `client_email` fields from the file you downloaded in Step 2 into the `FIREBASE_PRIVATE_KEY` and `FIREBASE_CLIENT_EMAIL` fields respectively
+
+### Step 5: Set up Firebase
+
+1. Open `packages/nextjs/services/firebase.ts`
+2. Paste the configuration object from the file you downloaded in Step 2
+
+### Step 6: Create an Endpoint
+
+1. Create a new file named `test-endpoint/route.ts` in `packages/nextjs/app/api`
+2. Add the following code:
+
+```typescript
+import { withFirebaseAuth } from "~~/utils/endpoint-auth";
+
+export const POST = withFirebaseAuth(async (req, { userCredential }) => {
+  return new Response(`You are authenticated as ${userCredential.user.uid}.`, { status: 200 });
+});
+```
+
+### Step 7: Edit The Frontend
+
+1. Open `packages/nextjs/app/index.tsx`
+2. At the top of the component, add the following line (you may need to manually import it from `~~/hooks/useFirebaseAuth`):
+
+```typescript
+const { authenticate, isAuthenticating } = useFirebaseAuth();
+```
+
+3. Add a function that calls the endpoint:
+
+```typescript
+const handleClick = async () => {
+  const accessToken = await authenticate();
+
+  if (!accessToken) {
+    return;
+  }
+
+  const response = await fetch("/api/test-endpoint", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken.token}`,
+    },
+  });
+
+  const data = await response.text();
+  console.log(data);
+};
+```
+
+4. Add a button that calls the function:
+
+```typescript
+<button onClick={handleClick} disabled={isAuthenticating}>
+  {isAuthenticating ? "Authenticating..." : "Authenticate"}
+</button>
+```
+
+### Step 8: Run the project
+
+1. Run the project using the following command:
+
+```
+yarn start
+```
+
+2. Open the project (usually located at [localhost:3000](http://localhost:3000)) in your browser
+3. Click on the button and authenticate with your wallet
+4. In the console, you should see the message `You are authenticated as <your address>`
+
+And that's it! You now have a working Firebase Auth setup in Scaffold-ETH 2.
+
