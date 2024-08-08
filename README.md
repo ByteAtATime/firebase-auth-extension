@@ -54,7 +54,7 @@ export default function MyComponent() {
     const response = await fetch("/api/my-endpoint", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken.token}`,
       },
       body: JSON.stringify({
         // ...
@@ -72,6 +72,5 @@ export default function MyComponent() {
 
 A few things to note here:
 1. If the `authenticate` function fails, it will create a toast explaining why; you can ignore the error in this case.
-2. For endpoints created using the `withFirebaseAuth` helper, you need to pass the `accessToken` in the `Authorization` header.
-3. The `isAuthenticating` field can be used to disable the button while the user is authenticating.
-
+2. For endpoints created using the `withFirebaseAuth` helper, you need to pass the token in the `Authorization` header.
+3. The `authenticate()` function returns a promise of `{ token: string; expires: number }`. If you only need the authentication, remember to use the `.token`!
