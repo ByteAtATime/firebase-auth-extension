@@ -10,9 +10,19 @@ npx create-eth@latest -e ByteAtATime/firebase-auth-extension:main
 
 ## Configuration
 
-Copy `packages/nextjs/.env.example` to `packages/nextjs/.env` and fill in the required Firebase configuration values. (You need to create a Firebase project if you haven't already.) Remember to make sure Firebase Auth is enabled in the Firebase console for your project.
+To get started, you need to get your Firebase credentials. Here is a video that explains how to do that:
 
-You first need to set up Firebase. In your project, create a new web app and copy the configuration file. In `packages/nextjs/services/firebase.ts`, update the `firebaseConfig` object with your Firebase configuration.
+![Firebase Configuration](/assets/firebase-creds.mp4)
+
+By the end of the video, you should have downloaded a file and copied the configuration object. You will need to paste this configuration object in the `packages/nextjs/services/firebase.ts` file.
+
+Then, you should set up your environment variables. You can do this by copying the `packages/nextjs/.env.example` file to `packages/nextjs/.env` and filling in the values.
+
+There are two ways you can set them up:
+1. Move the file you downloaded into your project, and point the `GOOGLE_APPLICATION_CREDENTIALS` to the file.
+2. Copy the `private_key` and `client_email` fields from the file you downloaded into the `FIREBASE_PRIVATE_KEY` and `FIREBASE_CLIENT_EMAIL` fields respectively.
+
+Either way, you also have to set up the `FIREBASE_PROJECT_ID` field with the project ID from the Firebase console.
 
 ### Endpoints
 
