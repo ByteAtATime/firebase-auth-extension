@@ -50,7 +50,7 @@ The `userCredential.user` is the Firebase `User` object. However, because we're 
 * `isAnonymous` is false
 * `providerId` and `providerData` are null and blank respectively
 
-The `uid` field is the user's address.
+The `uid` field is the user's address. In the body of the endpoint, you can use the `firebase` (not `firebase-admin`) library, which will respect your rules (where applicable, such as for Firestore, Storage, and Realtime Database). The helper function automatically logs in as the user, so you can immediately call functions such as `setDoc`.
 
 ### Invoking Endpoints
 
