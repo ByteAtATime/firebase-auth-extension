@@ -1,7 +1,10 @@
 import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { Address, Hex, recoverTypedDataAddress } from "viem";
 import { adminAuth } from "~~/services/admin";
 import { EIP_712_DOMAIN, EIP_712_TYPES__AUTHENTICATE } from "~~/utils/eip712";
+import { auth } from "~~/services/firebase";
+import { signInWithCustomToken } from "firebase/auth";
 
 type AuthenticateBody = {
   signer?: Address;
@@ -30,9 +33,19 @@ export const POST = async (req: NextRequest) => {
   try {
     const accessToken = await adminAuth.createCustomToken(signer);
 
-    return Response.json({ data: { accessToken } }, { status: 200 });
+    const userCredential = await signInWithCustomToken(auth, accessToken);
+
+    const fiveDays = 60 * 60 * 24 * 5 * 1000;
+    const expiresAt = Date.now() + fiveDays - 1000 * 60; // just to be safe
+    const sessionCookie = await adminAuth.createSessionCookie(await userCredential.user.getIdToken(), {
+      expiresIn: fiveDays,
+    });
+  
+    cookies().set("__session", sessionCookie);
+
+    return Response.json({ success: true, expiresAt }, { status: 200 });
   } catch (e) {
     console.error(e);
-    return new Response("Authentication failed", { status: 500 });
+    return Response.json({ success: false }, { status: 500 });
   }
 };

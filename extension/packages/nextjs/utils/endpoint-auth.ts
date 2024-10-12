@@ -1,24 +1,26 @@
 import { NextRequest } from "next/server";
-import { UserCredential, signInWithCustomToken } from "@firebase/auth";
-import { auth } from "~~/services/firebase";
+import { UserCredential } from "@firebase/auth";
+import { cookies } from "next/headers";
+import { adminAuth } from "~~/services/admin";
+import { DecodedIdToken } from "firebase-admin/auth";
 
-export const withFirebaseAuth =
-  <Params>(
-    handler: (request: NextRequest, context: { params: Params; userCredential: UserCredential }) => Promise<Response>,
-  ) =>
-  async (req: NextRequest, context: { params: Params }): Promise<Response> => {
-    const token = req.headers.get("authorization")?.replace("Bearer ", "");
+export function withFirebaseAuth<Params>(handler: (request: NextRequest, context: { params: Params; decodedToken: DecodedIdToken }) => Promise<Response>) {
+  return async (req: NextRequest, context: { params: Params }): Promise<Response> => {
+    const token = cookies().get("__session")?.value;
 
     if (!token) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    let userCredential: UserCredential | undefined = undefined;
+    let decodedToken: DecodedIdToken | undefined = undefined;
     try {
-      userCredential = await signInWithCustomToken(auth, token);
+      decodedToken = await adminAuth.verifySessionCookie(token);
     } catch {
-      return new Response("Invalid token", { status: 401 });
+      return new Response("Unauthorized", { status: 401 });
     }
 
-    return handler(req, { ...context, userCredential });
+    console.log(decodedToken);
+
+    return handler(req, { ...context, decodedToken });
   };
+}

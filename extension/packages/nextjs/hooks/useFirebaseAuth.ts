@@ -4,26 +4,15 @@ import { useAccount, useSignTypedData } from "wagmi";
 import { EIP_712_DOMAIN, EIP_712_TYPES__AUTHENTICATE } from "~~/utils/eip712";
 import { notification } from "~~/utils/scaffold-eth";
 
-type AccessToken = {
-  token: string;
-  expires: number;
-};
-
 export const useFirebaseAuth = () => {
   const { address } = useAccount();
-  const [accessToken, setAccessToken] = useLocalStorage<AccessToken | null>("access-token", null);
+  const [sessionExpiresAt, setSessionExpiresAt] = useLocalStorage<number>("sessionExpiresAt", 0);
   const { signTypedDataAsync } = useSignTypedData();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const authenticate = async () => {
-    if (accessToken) {
-      if (Date.now() < accessToken.expires) {
-        return accessToken;
-      } else {
-        notification.warning("Access token expired, please re-authenticate!");
-      }
-
-      setAccessToken(null);
+    if (sessionExpiresAt && sessionExpiresAt > Date.now()) {
+      return;
     }
 
     const loadingNotif = notification.loading("Authenticating...");
@@ -51,15 +40,13 @@ export const useFirebaseAuth = () => {
       return;
     }
 
-    const {
-      data: { accessToken: token },
-    } = await response.json();
-    const value = { token: token, expires: Date.now() + 3600 * 1000 };
-    setAccessToken(value);
+    const { expiresAt } = await response.json();
+    setSessionExpiresAt(expiresAt);
+
     notification.remove(loadingNotif);
     notification.success("Authenticated successfully!");
 
-    return value;
+    return;
   };
 
   return {
@@ -67,7 +54,7 @@ export const useFirebaseAuth = () => {
       setIsAuthenticating(true);
       const token = await authenticate();
       setIsAuthenticating(false);
-      
+
       return token;
     },
     isAuthenticating,
